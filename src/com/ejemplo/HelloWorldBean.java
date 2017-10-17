@@ -1,34 +1,64 @@
 package com.ejemplo;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.inject.Inject;
+
+import com.ejemplo.entities.Event;
+import com.ejemplo.entities.User;
 
 @SessionScoped
 @ManagedBean( name = "helloWorldBean" )
 public class HelloWorldBean implements Serializable {
   private static final long serialVersionUID = 1490630053711309405L;
 
-  private String name;
+  @Inject
+  private EventService eventService;
 
-  public String hello() {
-    System.out.println( "Calling hellworld.xhtml" );
-    return "success";
+  private List<Event> data;
+  private Event temporal;
+  private User loggedUser;
+
+  @PostConstruct
+  private void init() {
+    loggedUser = new User();
+    loggedUser.setId( 1L );
   }
 
-  public String getCurrentTime() {
-    return LocalDateTime.now().format( DateTimeFormatter.ofPattern( "dd MMM-yyyy HH:mm:ss" ) );
+  public void guardarEvento() {
+    eventService.guardarEvento( temporal, loggedUser );
+
+    data = eventService.activeEvents( loggedUser );
+
+    temporal.setName( "" );
   }
 
-  public String getName() {
-    return name;
+  public List<Event> getData() {
+    return data;
   }
 
-  public void setName( String name ) {
-    this.name = name;
+  public void setData( List<Event> data ) {
+    this.data = data;
+  }
+
+  public EventService getEventService() {
+    return eventService;
+  }
+
+  public void setEventService( EventService eventService ) {
+    this.eventService = eventService;
+  }
+
+  public Event getTemporal() {
+    return temporal;
+  }
+
+  public void setTemporal( Event temporal ) {
+    this.temporal = temporal;
   }
 
 }
